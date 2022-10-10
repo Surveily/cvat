@@ -23,7 +23,7 @@ import data.utils
 #     }
 # }
 
-default allow = false
+default allow = true
 
 allow {
     utils.is_admin
