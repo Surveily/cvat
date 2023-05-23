@@ -245,6 +245,7 @@ analytics:
     apiUrl: ""
     username: ""
     password: ""
+    memory: 5Gi
 
 vector:
   envFrom:
