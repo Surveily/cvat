@@ -239,6 +239,13 @@ analytics:
     service:
       name: grafana
       port: 80
+  job:
+    labels: {}
+    annotations: {}
+    apiUrl: ""
+    username: ""
+    password: ""
+    memory: 5Gi
 
 vector:
   envFrom:
