@@ -1,0 +1,63 @@
+{{- if .Values.analytics.enabled }}
+{{- $fullName := printf "%s-annotator-analyzer" .Release.Name -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $fullName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: cvat-app
+    tier: backend
+    component: job
+    {{- include "cvat.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: cvat-app
+            tier: backend
+            component: analyzer
+            {{- include "cvat.labels" . | nindent 12 }}
+            {{- with .Values.analytics.job.labels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.analytics.job.annotations }}
+          annotations:
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+        spec:
+          volumes:
+          - name: "{{ .Release.Name }}-analyzer-data"
+            persistentVolumeClaim:
+              claimName: {{ .Release.Name }}-analyzer-data
+          containers:
+          - name: {{ $fullName }}
+            image: "registry.surveily.com/surveily.developer.sdp:latest" # SDP
+            imagePullPolicy: IfNotPresent
+            command: ["bash", "-c"]
+            args: ["python3 -m scripts.cvat_progress_analyze_cron --api $API --username $USERNAME --password $PASSWORD"]
+            env:
+              - name: API
+                value: {{ .Values.analytics.job.apiUrl }}
+              - name: USERNAME
+                value: {{ .Values.analytics.job.username }}
+              - name: PASSWORD
+                value: {{ .Values.analytics.job.password }}
+            volumeMounts:
+              - mountPath: /workspace/ProgressAnalysis
+                name: "{{ .Release.Name }}-analyzer-data"
+                subPath: analysis
+            resources:
+              limits:
+                memory: 1.0Gi
+              requests:
+                cpu: 1000m
+          {{- with .Values.analytics.job.affinity }}
+          affinity: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          restartPolicy: OnFailure
+{{- end }}

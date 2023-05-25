@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: default
+spec:
+  volumes:
+  - name: "{{ .Release.Name }}-analyzer-data"
+    persistentVolumeClaim:
+      claimName: {{ .Release.Name }}-analyzer-data
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: busybox
+    volumeMounts:
+    - mountPath: /workspace/ProgressAnalysis
+      name: "{{ .Release.Name }}-analyzer-data"
+      subPath: analysis
+  restartPolicy: Always
+
