@@ -1,9 +1,12 @@
+{{- if .Values.analytics.enabled }}
+{{- $fullName := printf "%s-storage-access" .Release.Name -}}
 apiVersion: v1
-kind: Pod
+kind: Deployment
 metadata:
-  name: busybox
+  name: {{ $fullName }}
   namespace: default
 spec:
+  replicas: 0
   volumes:
   - name: "{{ .Release.Name }}-analyzer-data"
     persistentVolumeClaim:
@@ -14,10 +17,9 @@ spec:
       - sleep
       - "3600"
     imagePullPolicy: IfNotPresent
-    name: busybox
+    name: {{ $fullName }}
     volumeMounts:
     - mountPath: /workspace/ProgressAnalysis
       name: "{{ .Release.Name }}-analyzer-data"
       subPath: analysis
   restartPolicy: Always
-
