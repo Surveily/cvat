@@ -34,6 +34,20 @@ spec:
           - name: "{{ .Release.Name }}-analyzer-data"
             persistentVolumeClaim:
               claimName: {{ .Release.Name }}-analyzer-data
+          initContainers:
+          - name: user-data-permission-fix
+            image: busybox
+            command: ["/bin/chmod", "-R", "777", "/workspace/ProgressAnalysis"]
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 1.0Gi
+              requests:
+                cpu: 100m
+            volumeMounts:
+              - mountPath: /workspace/ProgressAnalysis
+                name: "{{ .Release.Name }}-analyzer-data"
+                subPath: analysis
           containers:
           - name: {{ $fullName }}
             image: "registry.surveily.com/surveily.developer.sdp:latest" # SDP
