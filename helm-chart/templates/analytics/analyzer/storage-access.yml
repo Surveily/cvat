@@ -13,9 +13,7 @@ spec:
       claimName: {{ .Release.Name }}-analyzer-data
   containers:
   - image: busybox
-    command:
-      - sleep
-      - "3600"
+    command: ["sleep", "infinity"]
     imagePullPolicy: IfNotPresent
     name: {{ $fullName }}
     volumeMounts:
