@@ -1,5 +1,5 @@
 {{- if .Values.analytics.enabled }}
-{{- $fullName := printf "%s-storage-access" .Release.Name -}}
+{{- $fullName := printf "%s-terminal" .Release.Name -}}
 apiVersion: v1
 kind: Deployment
 metadata:
