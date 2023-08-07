@@ -1,22 +1,24 @@
+{{- if .Values.analytics.enabled }}
+{{- $fullName := printf "%s-terminal" .Release.Name -}}
 apiVersion: v1
-kind: Pod
+kind: Deployment
 metadata:
-  name: busybox
+  name: {{ $fullName }}
   namespace: {{ .Release.Namespace }}
 spec:
+  replicas: 0
   volumes:
   - name: "{{ .Release.Name }}-analyzer-data"
     persistentVolumeClaim:
       claimName: {{ .Release.Name }}-analyzer-data
   containers:
   - image: busybox
-    command:
-      - sleep
-      - "3600"
+    command: ["sleep", "infinity"]
     imagePullPolicy: IfNotPresent
-    name: busybox
+    name: {{ $fullName }}
     volumeMounts:
     - mountPath: /workspace/ProgressAnalysis
       name: "{{ .Release.Name }}-analyzer-data"
       subPath: analysis
   restartPolicy: Always
+{{- end }}
